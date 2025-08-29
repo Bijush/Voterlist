@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -39,7 +39,7 @@
             <small class="text-muted">{{ file.timestamp }}</small>
           </div>
           <div>
-            <!-- ✅ Direct link to Firebase Storage URL -->
+            <!-- Directly use the signed URL from Firebase -->
             <a href="{{ file.url }}" class="btn btn-sm btn-success" target="_blank">View</a>
             <a href="/delete/{{ file.filename }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this PDF?')">Delete</a>
           </div>
@@ -52,4 +52,3 @@
 </div>
 </body>
 </html>
-        
