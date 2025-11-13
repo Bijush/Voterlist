@@ -1,54 +1,161 @@
-          <!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PDF Library</title>
+  <meta charset="utf-8"><title>Voter Lists</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { padding: 18px; background:#f8f9fa; }
+    .card-grid { display:flex; flex-wrap:wrap; gap:12px; }
+    .entry-card { width: 100%; max-width:560px; }
+    .badge-year { font-weight:600; }
+    .muted-small { font-size:0.85rem; color:#666; }
+    .filter-row { gap:12px; margin-bottom:12px; }
+    /* highlight row when complete/submitted/pending handled client-side via classes */
+    .row-submitted { background: #e8f7ff; }
+    .row-complete  { background: #e7f9f5; }
+    .row-pending   { background: #f3f3f3; }
+  </style>
 </head>
-<body class="bg-light">
-<div class="container py-4">
-  <h1 class="mb-4 text-center">📚 PDF Library</h1>
-
-  <!-- Upload Form -->
-  <form action="/upload" method="POST" enctype="multipart/form-data" class="row g-3 mb-4">
-    <div class="col-md-6">
-      <input type="text" name="title" class="form-control" placeholder="Enter PDF title" required>
+<body>
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="m-0">Voter Lists</h3>
+      <div>
+        <a href="{{ url_for('upload') }}" class="btn btn-success">
+          <i class="bi bi-upload"></i> Upload
+        </a>
+      </div>
     </div>
-    <div class="col-md-4">
-      <input type="file" name="pdf" accept="application/pdf" class="form-control" required>
-    </div>
-    <div class="col-md-2">
-      <button class="btn btn-primary w-100" type="submit">Upload</button>
-    </div>
-  </form>
 
-  <!-- Search -->
-  <form method="GET" class="input-group mb-4">
-    <input type="text" name="search" class="form-control" placeholder="Search by title..." value="{{ search }}">
-    <button class="btn btn-outline-secondary" type="submit">Search</button>
-  </form>
+    <!-- Filters -->
+    <div class="row filter-row">
+      <div class="col-md-2"><select id="district" class="form-select"><option value="">All Districts</option></select></div>
+      <div class="col-md-2"><select id="block" class="form-select"><option value="">All Blocks</option></select></div>
+      <div class="col-md-2"><select id="gp" class="form-select"><option value="">All GPs</option></select></div>
+      <div class="col-md-2"><select id="ps" class="form-select"><option value="">All Polling Stations</option></select></div>
+      <div class="col-md-2"><select id="year" class="form-select"><option value="">All Years</option></select></div>
+      <div class="col-md-2">
+        <input id="q" class="form-control" placeholder="Search name/file..." />
+      </div>
+    </div>
 
-  <!-- PDF List -->
-  {% if files %}
-    <div class="list-group">
-      {% for file in files %}
-        <div class="list-group-item d-flex justify-content-between align-items-center">
+    <!-- Cards -->
+    <div id="cards" class="card-grid mb-4">
+      <!-- cards injected by JS -->
+    </div>
+
+    <hr/>
+    <p class="muted-small">Tip: Click <i class="bi bi-eye"></i> to view (new tab), <i class="bi bi-download"></i> to download via server, or <i class="bi bi-trash"></i> to delete.</p>
+  </div>
+
+<script>
+  // entries passed from server
+  const ENTRIES = {{ entries | tojson | safe }};
+
+  // build unique sets
+  const uniq = (arr) => [...new Set(arr.filter(x=>x && x!==null))].sort();
+
+  function populateFilters(entries) {
+    const districts = uniq(entries.map(e=>e.district));
+    const blocks = uniq(entries.map(e=>e.block));
+    const gps = uniq(entries.map(e=>e.gp));
+    const pss = uniq(entries.map(e=>e.polling_station));
+    const years = uniq(entries.map(e=>e.year));
+
+    const fill = (id, items) => {
+      const sel = document.getElementById(id);
+      sel.innerHTML = '<option value="">All</option>';
+      items.forEach(i=>{
+        const o = document.createElement('option'); o.value = i; o.textContent = i; sel.appendChild(o);
+      });
+    };
+    fill('district', districts);
+    fill('block', blocks);
+    fill('gp', gps);
+    fill('ps', pss);
+    fill('year', years);
+  }
+
+  function renderCards(entries) {
+    const container = document.getElementById('cards');
+    container.innerHTML = '';
+    if (!entries.length) {
+      container.innerHTML = '<div class="text-muted">No voter lists found.</div>';
+      return;
+    }
+    entries.forEach(e=>{
+      const div = document.createElement('div');
+      div.className = 'card entry-card p-2';
+      // row classes by e.complete if available (we used "complete/submitted/pending" earlier)
+      const state = (e.complete || '').toLowerCase();
+      if (state==='submitted') div.classList.add('row-submitted');
+      if (state==='complete') div.classList.add('row-complete');
+      if (state==='pending') div.classList.add('row-pending');
+
+      div.innerHTML = `
+        <div class="d-flex justify-content-between align-items-start">
           <div>
-            <h5 class="mb-1">{{ file.title }}</h5>
-            <small class="text-muted">{{ file.timestamp }}</small>
+            <h5 class="mb-1">${escapeHtml(e.polling_station || e.filename || '—')}</h5>
+            <div class="muted-small">${escapeHtml(e.district)} / ${escapeHtml(e.block)} / ${escapeHtml(e.gp)}</div>
+            <div class="muted-small">Uploaded: ${escapeHtml(e.uploaded_at || '-') } &nbsp; <span class="badge badge-year">${escapeHtml(e.year || '')}</span></div>
+            <div class="muted-small">File: ${escapeHtml(e.filename || '')}</div>
           </div>
-          <div>
-            <!-- Directly use the signed URL from Firebase -->
-            <a href="{{ file.url }}" class="btn btn-sm btn-success" target="_blank">View</a>
-            <a href="/delete/{{ file.filename }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this PDF?')">Delete</a>
+          <div class="d-flex flex-column gap-1 align-items-end">
+            <a href="${e.public_url || '#'}" target="_blank" class="btn btn-sm btn-outline-primary mb-1" ${e.public_url ? '' : 'disabled'} title="View">
+              <i class="bi bi-eye"></i>
+            </a>
+            <a href="/download/${e.id}" class="btn btn-sm btn-success mb-1" title="Download (server)">
+              <i class="bi bi-download"></i>
+            </a>
+            <form method="post" action="/delete/${e.id}" onsubmit="return confirm('Delete this record?');">
+              <button class="btn btn-sm btn-danger" type="submit" title="Delete"><i class="bi bi-trash"></i></button>
+            </form>
           </div>
         </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <p class="text-muted text-center">No PDFs found.</p>
-  {% endif %}
-</div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+
+  // filter logic
+  function filterEntries() {
+    const district = document.getElementById('district').value;
+    const block = document.getElementById('block').value;
+    const gp = document.getElementById('gp').value;
+    const ps = document.getElementById('ps').value;
+    const year = document.getElementById('year').value;
+    const q = (document.getElementById('q').value || '').toLowerCase();
+
+    let arr = ENTRIES.slice();
+
+    if (district) arr = arr.filter(e=> (e.district||'') === district);
+    if (block) arr = arr.filter(e=> (e.block||'') === block);
+    if (gp) arr = arr.filter(e=> (e.gp||'') === gp);
+    if (ps) arr = arr.filter(e=> (e.polling_station||'') === ps);
+    if (year) arr = arr.filter(e=> (e.year||'') === year);
+
+    if (q) {
+      arr = arr.filter(e=>{
+        const txt = `${e.filename} ${e.polling_station} ${e.district} ${e.block} ${e.gp}`.toLowerCase();
+        return txt.indexOf(q) !== -1;
+      });
+    }
+
+    renderCards(arr);
+  }
+
+  // populate and setup listeners
+  populateFilters(ENTRIES);
+  renderCards(ENTRIES);
+
+  ['district','block','gp','ps','year'].forEach(id=>{
+    document.getElementById(id).addEventListener('change', filterEntries);
+  });
+  document.getElementById('q').addEventListener('input', filterEntries);
+</script>
 </body>
 </html>
