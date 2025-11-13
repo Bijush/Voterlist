@@ -1,161 +1,177 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><title>Voter Lists</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8">
+  <title>Voter Lists</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <style>
-    body { padding: 18px; background:#f8f9fa; }
-    .card-grid { display:flex; flex-wrap:wrap; gap:12px; }
-    .entry-card { width: 100%; max-width:560px; }
-    .badge-year { font-weight:600; }
-    .muted-small { font-size:0.85rem; color:#666; }
-    .filter-row { gap:12px; margin-bottom:12px; }
-    /* highlight row when complete/submitted/pending handled client-side via classes */
-    .row-submitted { background: #e8f7ff; }
-    .row-complete  { background: #e7f9f5; }
-    .row-pending   { background: #f3f3f3; }
+    body {
+      background-color: #f8f9fa;
+      font-family: "Inter", sans-serif;
+    }
+    .navbar {
+      background-color: #1b5e20;
+    }
+    .navbar-brand {
+      font-weight: 600;
+      color: #fff !important;
+    }
+    .filter-select {
+      border-radius: 10px;
+      font-size: 14px;
+    }
+    .voter-card {
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: none;
+      transition: transform 0.2s;
+    }
+    .voter-card:hover {
+      transform: translateY(-3px);
+    }
+    .btn-action {
+      border-radius: 10px;
+    }
+    .upload-btn {
+      background-color: #2e7d32;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: white;
+      font-weight: 500;
+    }
+    .upload-btn:hover {
+      background-color: #1b5e20;
+    }
+    .tip {
+      font-size: 13px;
+      color: #666;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h3 class="m-0">Voter Lists</h3>
-      <div>
-        <a href="{{ url_for('upload') }}" class="btn btn-success">
-          <i class="bi bi-upload"></i> Upload
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="#">📋 Voter Lists</a>
+      <div class="ms-auto">
+        <a href="{{ url_for('upload') }}" class="upload-btn">
+          <i class="bi bi-cloud-upload"></i> Upload
         </a>
       </div>
     </div>
+  </nav>
 
-    <!-- Filters -->
-    <div class="row filter-row">
-      <div class="col-md-2"><select id="district" class="form-select"><option value="">All Districts</option></select></div>
-      <div class="col-md-2"><select id="block" class="form-select"><option value="">All Blocks</option></select></div>
-      <div class="col-md-2"><select id="gp" class="form-select"><option value="">All GPs</option></select></div>
-      <div class="col-md-2"><select id="ps" class="form-select"><option value="">All Polling Stations</option></select></div>
-      <div class="col-md-2"><select id="year" class="form-select"><option value="">All Years</option></select></div>
-      <div class="col-md-2">
-        <input id="q" class="form-control" placeholder="Search name/file..." />
+  <div class="container my-4">
+    <div class="row g-2">
+      <div class="col-6 col-md-2">
+        <select id="districtFilter" class="form-select filter-select">
+          <option value="">All Districts</option>
+          {% for e in entries|unique(attribute='district') %}
+          <option>{{ e.district }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-2">
+        <select id="blockFilter" class="form-select filter-select">
+          <option value="">All Blocks</option>
+          {% for e in entries|unique(attribute='block') %}
+          <option>{{ e.block }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-2">
+        <select id="gpFilter" class="form-select filter-select">
+          <option value="">All GPs</option>
+          {% for e in entries|unique(attribute='gp') %}
+          <option>{{ e.gp }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-2">
+        <select id="pollingFilter" class="form-select filter-select">
+          <option value="">All Polling Stations</option>
+          {% for e in entries|unique(attribute='polling_station') %}
+          <option>{{ e.polling_station }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-2">
+        <select id="yearFilter" class="form-select filter-select">
+          <option value="">All Years</option>
+          {% for e in entries|unique(attribute='year') %}
+          <option>{{ e.year }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-2">
+        <input type="text" id="searchBox" class="form-control filter-select" placeholder="Search name/file...">
       </div>
     </div>
 
-    <!-- Cards -->
-    <div id="cards" class="card-grid mb-4">
-      <!-- cards injected by JS -->
-    </div>
+    <hr class="my-3">
 
-    <hr/>
-    <p class="muted-small">Tip: Click <i class="bi bi-eye"></i> to view (new tab), <i class="bi bi-download"></i> to download via server, or <i class="bi bi-trash"></i> to delete.</p>
-  </div>
-
-<script>
-  // entries passed from server
-  const ENTRIES = {{ entries | tojson | safe }};
-
-  // build unique sets
-  const uniq = (arr) => [...new Set(arr.filter(x=>x && x!==null))].sort();
-
-  function populateFilters(entries) {
-    const districts = uniq(entries.map(e=>e.district));
-    const blocks = uniq(entries.map(e=>e.block));
-    const gps = uniq(entries.map(e=>e.gp));
-    const pss = uniq(entries.map(e=>e.polling_station));
-    const years = uniq(entries.map(e=>e.year));
-
-    const fill = (id, items) => {
-      const sel = document.getElementById(id);
-      sel.innerHTML = '<option value="">All</option>';
-      items.forEach(i=>{
-        const o = document.createElement('option'); o.value = i; o.textContent = i; sel.appendChild(o);
-      });
-    };
-    fill('district', districts);
-    fill('block', blocks);
-    fill('gp', gps);
-    fill('ps', pss);
-    fill('year', years);
-  }
-
-  function renderCards(entries) {
-    const container = document.getElementById('cards');
-    container.innerHTML = '';
-    if (!entries.length) {
-      container.innerHTML = '<div class="text-muted">No voter lists found.</div>';
-      return;
-    }
-    entries.forEach(e=>{
-      const div = document.createElement('div');
-      div.className = 'card entry-card p-2';
-      // row classes by e.complete if available (we used "complete/submitted/pending" earlier)
-      const state = (e.complete || '').toLowerCase();
-      if (state==='submitted') div.classList.add('row-submitted');
-      if (state==='complete') div.classList.add('row-complete');
-      if (state==='pending') div.classList.add('row-pending');
-
-      div.innerHTML = `
-        <div class="d-flex justify-content-between align-items-start">
-          <div>
-            <h5 class="mb-1">${escapeHtml(e.polling_station || e.filename || '—')}</h5>
-            <div class="muted-small">${escapeHtml(e.district)} / ${escapeHtml(e.block)} / ${escapeHtml(e.gp)}</div>
-            <div class="muted-small">Uploaded: ${escapeHtml(e.uploaded_at || '-') } &nbsp; <span class="badge badge-year">${escapeHtml(e.year || '')}</span></div>
-            <div class="muted-small">File: ${escapeHtml(e.filename || '')}</div>
+    <div id="entriesList" class="row g-3">
+      {% for e in entries %}
+      <div class="col-12 col-md-6 col-lg-4 entry-card"
+           data-district="{{ e.district }}"
+           data-block="{{ e.block }}"
+           data-gp="{{ e.gp }}"
+           data-polling="{{ e.polling_station }}"
+           data-year="{{ e.year }}"
+           data-name="{{ e.filename|lower }}">
+        <div class="card voter-card p-3">
+          <h5 class="fw-bold text-success mb-2">
+            {{ e.year or "Unknown Year" }}
+          </h5>
+          <div class="small text-muted mb-1">
+            {{ e.district }} / {{ e.block }} / {{ e.gp }} / {{ e.polling_station }}
           </div>
-          <div class="d-flex flex-column gap-1 align-items-end">
-            <a href="${e.public_url || '#'}" target="_blank" class="btn btn-sm btn-outline-primary mb-1" ${e.public_url ? '' : 'disabled'} title="View">
-              <i class="bi bi-eye"></i>
-            </a>
-            <a href="/download/${e.id}" class="btn btn-sm btn-success mb-1" title="Download (server)">
-              <i class="bi bi-download"></i>
-            </a>
-            <form method="post" action="/delete/${e.id}" onsubmit="return confirm('Delete this record?');">
-              <button class="btn btn-sm btn-danger" type="submit" title="Delete"><i class="bi bi-trash"></i></button>
+          <div class="small text-secondary">Uploaded: {{ e.uploaded_at }}</div>
+          <div class="mt-2"><strong>File:</strong> {{ e.filename }}</div>
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            {% if e.public_url %}
+            <a href="{{ e.public_url }}" target="_blank" class="btn btn-outline-primary btn-sm btn-action" title="View"><i class="bi bi-eye"></i></a>
+            {% endif %}
+            <a href="{{ url_for('download_entry', entry_id=e.id) }}" class="btn btn-outline-success btn-sm btn-action" title="Download"><i class="bi bi-download"></i></a>
+            <form action="{{ url_for('delete_entry', entry_id=e.id) }}" method="post" onsubmit="return confirm('Delete this record?');">
+              <button class="btn btn-outline-danger btn-sm btn-action" title="Delete"><i class="bi bi-trash"></i></button>
             </form>
           </div>
         </div>
-      `;
-      container.appendChild(div);
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-4 tip">
+      Tip: Use filters or search above. Tap 👁️ to view, ⬇️ to download, or 🗑️ to delete.
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const filters = ['district', 'block', 'gp', 'polling', 'year'];
+    filters.forEach(f => {
+      document.getElementById(f + 'Filter').addEventListener('change', filterEntries);
     });
-  }
+    document.getElementById('searchBox').addEventListener('input', filterEntries);
 
-  function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
-
-  // filter logic
-  function filterEntries() {
-    const district = document.getElementById('district').value;
-    const block = document.getElementById('block').value;
-    const gp = document.getElementById('gp').value;
-    const ps = document.getElementById('ps').value;
-    const year = document.getElementById('year').value;
-    const q = (document.getElementById('q').value || '').toLowerCase();
-
-    let arr = ENTRIES.slice();
-
-    if (district) arr = arr.filter(e=> (e.district||'') === district);
-    if (block) arr = arr.filter(e=> (e.block||'') === block);
-    if (gp) arr = arr.filter(e=> (e.gp||'') === gp);
-    if (ps) arr = arr.filter(e=> (e.polling_station||'') === ps);
-    if (year) arr = arr.filter(e=> (e.year||'') === year);
-
-    if (q) {
-      arr = arr.filter(e=>{
-        const txt = `${e.filename} ${e.polling_station} ${e.district} ${e.block} ${e.gp}`.toLowerCase();
-        return txt.indexOf(q) !== -1;
+    function filterEntries() {
+      const vals = {};
+      filters.forEach(f => vals[f] = document.getElementById(f + 'Filter').value.toLowerCase());
+      const search = document.getElementById('searchBox').value.toLowerCase();
+      document.querySelectorAll('.entry-card').forEach(card => {
+        const match =
+          (!vals.district || card.dataset.district.toLowerCase() === vals.district) &&
+          (!vals.block || card.dataset.block.toLowerCase() === vals.block) &&
+          (!vals.gp || card.dataset.gp.toLowerCase() === vals.gp) &&
+          (!vals.polling || card.dataset.polling.toLowerCase() === vals.polling) &&
+          (!vals.year || card.dataset.year.toLowerCase() === vals.year) &&
+          (!search || card.dataset.name.includes(search));
+        card.style.display = match ? '' : 'none';
       });
     }
-
-    renderCards(arr);
-  }
-
-  // populate and setup listeners
-  populateFilters(ENTRIES);
-  renderCards(ENTRIES);
-
-  ['district','block','gp','ps','year'].forEach(id=>{
-    document.getElementById(id).addEventListener('change', filterEntries);
-  });
-  document.getElementById('q').addEventListener('input', filterEntries);
-</script>
+  </script>
 </body>
 </html>
