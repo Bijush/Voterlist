@@ -9,6 +9,7 @@
 <body class="bg-light">
   <div class="container py-4">
     <h2 class="mb-4 text-center">Upload Voter List PDF</h2>
+
     <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
       <div class="mb-3">
         <label class="form-label">District</label>
@@ -31,8 +32,18 @@
       </div>
 
       <div class="mb-3">
-        <label class="form-label">Upload PDF</label>
-        <input type="file" class="form-control" name="pdf" accept="application/pdf" required>
+        <label class="form-label">Year</label>
+        <input type="number" class="form-control" name="year" placeholder="e.g., 2024" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Uploader Name (optional)</label>
+        <input type="text" class="form-control" name="uploader" placeholder="Your name">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Upload PDF(s)</label>
+        <input type="file" class="form-control" name="pdfs" accept="application/pdf" multiple required>
       </div>
 
       <button type="submit" class="btn btn-primary w-100">Upload</button>
