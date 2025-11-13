@@ -1,6 +1,7 @@
+
 Flask
+firebase-admin
 python-dotenv
-requests
-google-auth
+gunicorn
 
 
