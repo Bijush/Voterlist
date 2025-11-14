@@ -1,49 +1,82 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><title>Upload Voter List</title>
+  <meta charset="utf-8">
+  <title>Upload Voter List</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-light">
   <div class="container py-4">
-    <div class="card p-3">
-      <h4>Upload Voter List PDF(s)</h4>
+    <div class="card p-3 shadow-sm">
+      <h4 class="mb-3 fw-bold">Upload Voter List PDF(s)</h4>
+
       <form method="post" enctype="multipart/form-data">
-        <div class="row g-2">
+        <div class="row g-3">
+
           <div class="col-md-4">
             <label class="form-label">District</label>
             <input name="district" class="form-control" required>
           </div>
+
           <div class="col-md-4">
             <label class="form-label">Block</label>
             <input name="block" class="form-control" required>
           </div>
+
           <div class="col-md-4">
             <label class="form-label">GP</label>
             <input name="gp" class="form-control" required>
           </div>
+
           <div class="col-md-4">
             <label class="form-label">Polling Station</label>
             <input name="polling_station" class="form-control" required>
           </div>
-          <div class="col-md-2">
-            <label class="form-label">Year</label>
-            <input name="year" class="form-control" required>
+
+          <!-- ✅ LAC Dropdown (Required) -->
+          <div class="col-md-4">
+            <label class="form-label">LAC (Legislative Assembly Constituency)</label>
+            <select name="lac_no" class="form-select" required>
+              <option value="" selected disabled>Select LAC</option>
+
+              <optgroup label="Cachar">
+                <option value="42-Udharbond">42 – Udharbond</option>
+                <option value="117-Borkhola">117 – Borkhola</option>
+              </optgroup>
+
+              <optgroup label="Karimganj">
+                <option value="3-Ratabari">3 – Ratabari</option>
+                <option value="4-Patharkandi">4 – Patharkandi</option>
+              </optgroup>
+
+              <optgroup label="Hailakandi">
+                <option value="6-Hailakandi">6 – Hailakandi</option>
+                <option value="7-Katlicherra">7 – Katlicherra</option>
+              </optgroup>
+
+            </select>
           </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Year</label>
+            <input name="year" type="number" class="form-control" placeholder="2024" required>
+          </div>
+
           <div class="col-md-6">
             <label class="form-label">Uploader (optional)</label>
             <input name="uploader" class="form-control" placeholder="Your name or team">
           </div>
 
           <div class="col-12">
-            <label class="form-label">Select PDF files</label>
+            <label class="form-label">Select PDF file(s)</label>
             <input name="pdfs" type="file" accept="application/pdf" multiple class="form-control" required>
-            <div class="form-text">You can select one or multiple PDFs. File names will be preserved.</div>
+            <div class="form-text">You may upload one or multiple PDFs. File names will be preserved.</div>
           </div>
         </div>
 
-        <div class="mt-3">
+        <div class="mt-4">
           <button class="btn btn-primary" type="submit">Upload</button>
           <a href="{{ url_for('index') }}" class="btn btn-secondary ms-2">Back</a>
         </div>
