@@ -8,10 +8,11 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 import firebase_admin
 from firebase_admin import credentials, db, storage
 import io
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-# --- Required environment variables (same style you used before) ---
+# --- Required environment variables ---
 # FIREBASE_SERVICE_ACCOUNT_BASE64  : base64-encoded service account JSON
 # FIREBASE_DATABASE_URL           : e.g. https://your-project-default-rtdb.firebaseio.com
 # FIREBASE_STORAGE_BUCKET         : e.g. your-project.appspot.com
@@ -48,6 +49,7 @@ def default_entry(data=None):
         "gp": "",
         "polling_station": "",
         "year": "",
+        "lac_no": "",           # <-- added LAC field
         "filename": "",
         "storage_path": "",
         "public_url": "",
@@ -68,22 +70,30 @@ def index():
         e = default_entry(item)
         e["id"] = eid
         entries.append(e)
-    # sort by district/block/ps/year
-    entries.sort(key=lambda x: (x.get("district",""), x.get("block",""), x.get("gp",""), x.get("polling_station",""), x.get("year","")))
+    # sort by district/block/gp/lac/polling/year for consistent display
+    entries.sort(key=lambda x: (
+        x.get("district", ""),
+        x.get("block", ""),
+        x.get("gp", ""),
+        x.get("lac_no", ""),
+        x.get("polling_station", ""),
+        x.get("year", "")
+    ))
     return render_template("index_voterlist.html", entries=entries)
 
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
     if request.method == "POST":
         # simple validation
-        district = request.form.get("district","").strip()
-        block = request.form.get("block","").strip()
-        gp = request.form.get("gp","").strip()
-        polling_station = request.form.get("polling_station","").strip()
-        year = request.form.get("year","").strip()
-        uploader = request.form.get("uploader","").strip() or "anonymous"
+        district = request.form.get("district", "").strip()
+        block = request.form.get("block", "").strip()
+        gp = request.form.get("gp", "").strip()
+        polling_station = request.form.get("polling_station", "").strip()
+        year = request.form.get("year", "").strip()
+        lac_no = request.form.get("lac_no", "").strip()  # NEW: LAC from form
+        uploader = request.form.get("uploader", "").strip() or "anonymous"
 
-        if not (district and block and gp and polling_station and year):
+        if not (district and block and gp and polling_station and year and lac_no):
             return "Missing fields", 400
 
         files = request.files.getlist("pdfs")
@@ -99,12 +109,37 @@ def upload():
                 continue
 
             rec_id = str(uuid.uuid4())
-            filename = f.filename.rsplit("/",1)[-1]
-            storage_path = f"voterlists/{district}/{block}/{gp}/{polling_station}/{year}/{rec_id}___{filename}"
+            # sanitize filename
+            filename = secure_filename(f.filename.rsplit("/", 1)[-1]) or f"{rec_id}.pdf"
+
+            # include lac_no in storage path for neatness
+            # sanitize path components simply by replacing slashes
+            def clean(s): return s.replace("/", "_").strip()
+            sd = clean(district)
+            sb = clean(block)
+            sg = clean(gp)
+            slac = clean(lac_no)
+            sps = clean(polling_station)
+            sy = clean(year)
+
+            storage_path = f"voterlists/{sd}/{sb}/{sg}/{slac}/{sps}/{sy}/{rec_id}___{filename}"
 
             blob = BUCKET.blob(storage_path)
-            # upload
-            blob.upload_from_file(f, content_type="application/pdf")
+            # upload - ensure stream is at start
+            try:
+                f.stream.seek(0)
+            except Exception:
+                try:
+                    f.seek(0)
+                except Exception:
+                    pass
+
+            try:
+                blob.upload_from_file(f.stream, content_type="application/pdf")
+            except Exception as e:
+                app.logger.error(f"Failed to upload blob {storage_path}: {e}")
+                continue
+
             # Make public to allow direct link (optional). If you prefer signed urls, remove this.
             try:
                 blob.make_public()
@@ -118,6 +153,7 @@ def upload():
                 "gp": gp,
                 "polling_station": polling_station,
                 "year": year,
+                "lac_no": lac_no,   # save LAC here
                 "filename": filename,
                 "storage_path": storage_path,
                 "public_url": public_url,
@@ -142,11 +178,11 @@ def delete_entry(entry_id):
     # delete blob if exists
     if storage_path:
         blob = BUCKET.blob(storage_path)
-        if blob.exists():
-            try:
+        try:
+            if blob.exists():
                 blob.delete()
-            except Exception as e:
-                app.logger.warning(f"Failed to delete blob {storage_path}: {e}")
+        except Exception as e:
+            app.logger.warning(f"Failed to delete blob {storage_path}: {e}")
     # delete db record
     DB_REF.child(entry_id).delete()
     return redirect(url_for("index"))
@@ -162,8 +198,12 @@ def download_entry(entry_id):
         abort(404)
 
     blob = BUCKET.blob(storage_path)
-    if not blob.exists():
-        abort(404)
+    try:
+        if not blob.exists():
+            abort(404)
+    except Exception as e:
+        app.logger.error(f"Error checking blob existence for {storage_path}: {e}")
+        abort(500)
 
     # stream blob bytes and send with correct headers
     try:
