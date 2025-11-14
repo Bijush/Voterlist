@@ -202,10 +202,11 @@
             {% endif %}
             <a href="{{ url_for('download_entry', entry_id=e.id) }}" class="btn btn-outline-success btn-sm btn-action" title="Download">
               <i class="bi bi-download"></i></a>
-
+<!--
             <form action="{{ url_for('delete_entry', entry_id=e.id) }}" method="post" onsubmit="return confirm('Delete this record?');">
               <button class="btn btn-outline-danger btn-sm btn-action" title="Delete"><i class="bi bi-trash"></i></button>
             </form>
+            -->
           </div>
         </div>
       </div>
