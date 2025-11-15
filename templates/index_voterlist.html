@@ -16,472 +16,375 @@
       --bg: #f4f6f8;
     }
 
-    body { background: var(--bg); font-family: Inter, system-ui; padding-bottom:120px; color:#222; margin:0;}
-    .navbar { background:var(--brand-green); padding:10px 0; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
-    .navbar-brand { color:#fff !important; font-size:1.15rem; font-weight:700; }
-    .upload-icon { background: rgba(255,255,255,0.08); padding:8px 12px; border-radius:999px; color:#fff; display:flex; align-items:center; gap:6px; text-decoration:none;}
-    .container-top { margin-top:14px; }
+    body {
+      background: var(--bg);
+      font-family: Inter, system-ui;
+      padding-bottom: 120px;
+      color: #222;
+    }
 
-    /* filter panel */
-    #filterPanel{ display:none; overflow:hidden; transition:all .35s ease;}
-    @media (min-width:768px){ #filterPanel{ display:block !important; } }
-    .filter-card{ background:#fff; border-radius:12px; padding:12px; box-shadow:0 4px 14px rgba(0,0,0,0.04); border:1px solid rgba(0,0,0,0.04); }
-    .filter-select{ min-height:44px; border-radius:10px; }
+    /* NAV */
+    .navbar {
+      background: var(--brand-green);
+      padding: 10px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .navbar-brand { color: #fff !important; font-size: 1.2rem; font-weight: 700; }
 
-    /* extra controls row */
-    .controls-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .upload-icon {
+      background: rgba(255,255,255,0.08);
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
 
-    /* cards */
-    .entry-card .card-surface{ background:#fff; border-radius:14px; border:1px solid rgba(0,0,0,0.04); box-shadow:0 6px 20px rgba(0,0,0,0.06); transition:all .18s ease; overflow:hidden; }
-    .entry-card .card-surface:hover{ transform:translateY(-6px); box-shadow:0 14px 40px rgba(0,0,0,0.09); }
-    .card-body-compact{ padding:18px; }
-    .lac-title{ color:#0f5132; font-weight:800; font-size:1rem; }
-    .year-big{ color:var(--accent-green); font-weight:700; font-size:1.15rem; }
-    .booth{ font-weight:600; color:#444; margin-top:6px; }
-    .address{ color:var(--muted); font-size:0.95rem; margin-bottom:8px; }
-    .file-box{ background:#f3f4f6; padding:10px; border-radius:8px; font-weight:600; display:inline-block; margin-top:8px; }
-    .uploaded{ color:var(--muted); font-size:0.85rem; }
+    /* FILTER PANEL */
+    #filterPanel {
+      display: none;
+      overflow: hidden;
+      transition: all .35s ease;
+    }
+    @media (min-width: 768px){
+      #filterPanel { display: block !important; }
+    }
 
-    .card-actions{ border-top:1px solid rgba(0,0,0,0.05); padding:12px; text-align:right; background:#fff; display:flex; justify-content:flex-end; gap:8px; }
-    .btn-action{ border-radius:10px; height:38px; width:44px; display:inline-flex; align-items:center; justify-content:center; }
+    .filter-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .filter-select { min-height: 44px; border-radius: 10px; }
 
-    /* compact mode */
-    .compact .card-body-compact{ padding:10px; }
-    .compact .address, .compact .booth { display:none; }
-    .compact .file-box{ padding:8px; font-size:0.9rem; }
+    /* CARDS */
+    .entry-card .card-surface {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,0.04);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+      transition: 0.2s ease;
+    }
+    .entry-card .card-surface:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.10);
+    }
 
-    /* scroll to top */
-    #toTopBtn{ position:fixed; right:16px; bottom:90px; display:none; z-index:2000; }
+    .card-body-compact {
+      padding: 18px;
+    }
 
-    /* footer */
-    footer.site-footer{ background:#fff; border-top:1px solid #e9ecef; padding:12px; position:fixed; left:0; right:0; bottom:0; text-align:center; z-index:1200; }
+    .lac-title {
+      color: #0f5132;
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .year-big {
+      color: var(--accent-green);
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
 
-    /* loading overlay */
-    #loadingOverlay{
-      position:fixed; left:0; top:0; right:0; bottom:0;
-      background:rgba(255,255,255,0.75);
-      z-index:3000; display:flex; align-items:center; justify-content:center;
-      font-size:1rem;
+    .booth { font-weight: 600; color: #444; }
+    .address { color: var(--muted); font-size: 0.95rem; }
+
+    .file-box {
+      background: #f3f4f6;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .uploaded { color: var(--muted); font-size: 0.85rem; }
+
+    .card-actions {
+      border-top: 1px solid rgba(0,0,0,0.05);
+      padding: 12px;
+      text-align: right;
+      background: #fff;
+    }
+    .btn-action {
+      border-radius: 10px;
+      height: 38px;
+      width: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* SCROLL TOP */
+    #toTopBtn {
+      position: fixed;
+      right: 16px;
+      bottom: 90px;
+      display: none;
+      z-index: 2000;
+    }
+
+    /* FOOTER */
+    footer.site-footer {
+      background: #fff;
+      border-top: 1px solid #ddd;
+      padding: 12px;
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      text-align: center;
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav class="navbar">
-    <div class="container d-flex justify-content-between">
-      <div class="navbar-brand">📋 Voter Lists</div>
-      <a href="{{ url_for('upload') }}" class="upload-icon">
-        <i class="bi bi-cloud-upload"></i><span class="d-none d-md-inline">Upload</span>
-      </a>
-    </div>
-  </nav>
+<!-- NAV -->
+<nav class="navbar">
+  <div class="container d-flex justify-content-between">
+    <a class="navbar-brand">📋 Voter Lists</a>
+    <a href="{{ url_for('upload') }}" class="upload-icon">
+      <i class="bi bi-cloud-upload"></i>
+      <span class="d-none d-md-inline">Upload</span>
+    </a>
+  </div>
+</nav>
 
-  <!-- Loading overlay -->
-  <div id="loadingOverlay" aria-hidden="true" style="display:flex;">
-    <div class="text-center">
-      <div class="spinner-border text-success" role="status" style="width:3rem;height:3rem;">
-        <span class="visually-hidden">Loading...</span>
+<div class="container mt-3">
+
+  <!-- MOBILE FILTER BUTTON -->
+  <div class="d-md-none mb-3">
+    <button id="toggleFilters" class="btn btn-primary w-100">Show Filters ↓</button>
+  </div>
+
+  <!-- FILTER PANEL -->
+  <div id="filterPanel" class="mb-3">
+    <div class="filter-card">
+
+      <div class="row g-2">
+
+        <!-- LAC -->
+        <div class="col-12 col-md-3">
+          <label class="form-label">LAC</label>
+          <select id="lacFilter" class="form-select filter-select">
+            <option value="">All LACs</option>
+          </select>
+        </div>
+
+        <!-- District -->
+        <div class="col-6 col-md-2">
+          <label class="form-label">District</label>
+          <select id="districtFilter" class="form-select filter-select">
+            <option value="">All Districts</option>
+            {% for d in entries|unique(attribute='district')|sort(attribute='district') %}
+            <option>{{ d.district }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Block -->
+        <div class="col-6 col-md-2">
+          <label class="form-label">Block</label>
+          <select id="blockFilter" class="form-select filter-select">
+            <option value="">All Blocks</option>
+            {% for b in entries|unique(attribute='block')|sort(attribute='block') %}
+            <option>{{ b.block }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- GP -->
+        <div class="col-6 col-md-2">
+          <label class="form-label">GP</label>
+          <select id="gpFilter" class="form-select filter-select">
+            <option value="">All GPs</option>
+            {% for g in entries|unique(attribute='gp')|sort(attribute='gp') %}
+            <option>{{ g.gp }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Polling -->
+        <div class="col-6 col-md-2">
+          <label class="form-label">Polling</label>
+          <select id="pollingFilter" class="form-select filter-select">
+            <option value="">All Polling</option>
+            {% for p in entries|unique(attribute='polling_station')|sort(attribute='polling_station') %}
+            <option>{{ p.polling_station }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Year -->
+        <div class="col-6 col-md-1">
+          <label class="form-label">Year</label>
+          <select id="yearFilter" class="form-select filter-select">
+            <option value="">All Years</option>
+            {% for y in entries|unique(attribute='year')|sort(attribute='year') %}
+            <option>{{ y.year }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Search -->
+        <div class="col-12 col-md-4">
+          <label class="form-label">Search</label>
+          <input id="searchBox" class="form-control filter-select" placeholder="Search name/file...">
+        </div>
+
       </div>
-      <div class="mt-2 text-muted">Loading...</div>
+
     </div>
   </div>
 
-  <div class="container container-top">
+  <!-- ENTRIES -->
+  <div class="row g-3" id="entriesList">
 
-    <!-- mobile show filters -->
-    <div class="d-md-none mb-3">
-      <button id="toggleFilters" class="btn btn-primary w-100">Show Filters ↓</button>
-    </div>
+    {% for e in entries %}
+    <div class="col-12 col-md-6 col-lg-4 entry-card"
+         data-lac="{{ e.lac_no }}-{{ e.lac_name }}"
+         data-district="{{ e.district }}"
+         data-block="{{ e.block }}"
+         data-gp="{{ e.gp }}"
+         data-polling="{{ e.polling_station }}"
+         data-year="{{ e.year }}"
+         data-name="{{ e.filename|lower }}">
 
-    <!-- filters -->
-    <div id="filterPanel" class="mb-3">
-      <div class="filter-card">
-        <div class="row g-2 align-items-center">
+      <div class="card-surface">
 
-          <!-- LAC -->
-          <div class="col-12 col-md-3">
-            <label class="form-label">LAC</label>
-            <select id="lacFilter" class="form-select filter-select">
-              <option value="">All LACs</option>
-            </select>
-          </div>
+        <div class="card-body card-body-compact">
 
-          <!-- District -->
-          <div class="col-6 col-md-2">
-            <label class="form-label">District</label>
-            <select id="districtFilter" class="form-select filter-select">
-              <option value="">All Districts</option>
-              {% for d in entries|unique(attribute='district')|sort(attribute='district') %}
-              <option>{{ d.district }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- Block -->
-          <div class="col-6 col-md-2">
-            <label class="form-label">Block</label>
-            <select id="blockFilter" class="form-select filter-select">
-              <option value="">All Blocks</option>
-              {% for b in entries|unique(attribute='block')|sort(attribute='block') %}
-              <option>{{ b.block }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- GP -->
-          <div class="col-6 col-md-2">
-            <label class="form-label">GP</label>
-            <select id="gpFilter" class="form-select filter-select">
-              <option value="">All GPs</option>
-              {% for g in entries|unique(attribute='gp')|sort(attribute='gp') %}
-              <option>{{ g.gp }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- Polling -->
-          <div class="col-6 col-md-2">
-            <label class="form-label">Polling</label>
-            <select id="pollingFilter" class="form-select filter-select">
-              <option value="">All Polling</option>
-              {% for p in entries|unique(attribute='polling_station')|sort(attribute='polling_station') %}
-              <option>{{ p.polling_station }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- Year -->
-          <div class="col-6 col-md-1">
-            <label class="form-label">Year</label>
-            <select id="yearFilter" class="form-select filter-select">
-              <option value="">All Years</option>
-              {% for y in entries|unique(attribute='year')|sort(attribute='year') %}
-              <option>{{ y.year }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- Search -->
-          <div class="col-12 col-md-4">
-            <label class="form-label">Search</label>
-            <input id="searchBox" class="form-control filter-select" placeholder="Search name/file...">
-          </div>
-
-          <!-- Controls: Sort & Layout -->
-          <div class="col-12 mt-2">
-            <div class="controls-row">
-              <div class="me-2">
-                <label class="form-label mb-1">Sort</label>
-                <select id="sortSelect" class="form-select filter-select">
-                  <option value="az">A → Z (File)</option>
-                  <option value="newest">Newest first</option>
-                  <option value="oldest">Oldest first</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="form-label mb-1 d-block">Layout</label>
-                <div class="btn-group" role="group" aria-label="Layout switch">
-                  <button id="fullBtn" type="button" class="btn btn-outline-secondary btn-sm">Full</button>
-                  <button id="compactBtn" type="button" class="btn btn-outline-secondary btn-sm">Compact</button>
-                </div>
-              </div>
-
-              <div class="ms-auto text-muted small align-self-end">Tip: pick District to filter LAC list</div>
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="lac-title">LAC: {{ e.lac_no }} - {{ e.lac_name }}</div>
+              <div class="year-big">{{ e.year }}</div>
+              <div class="booth">{{ e.polling_station }}</div>
+              <div class="address">{{ e.district }} / {{ e.block }} / {{ e.gp }}</div>
+            </div>
+            <div class="text-end">
+              <div class="uploaded">Uploaded</div>
+              <div class="uploaded fw-semibold">{{ e.uploaded_at }}</div>
             </div>
           </div>
 
-        </div>
-      </div>
-    </div>
-
-    <!-- entries list -->
-    <div id="entriesList" class="row g-3">
-      {% for e in entries %}
-      <div class="col-12 col-md-6 col-lg-4 entry-card"
-           data-lac="{{ (e.lac_no|string) ~ '-' ~ (e.lac_name|string) }}" 
-           data-district="{{ e.district }}"
-           data-block="{{ e.block }}"
-           data-gp="{{ e.gp }}"
-           data-polling="{{ e.polling_station }}"
-           data-year="{{ e.year }}"
-           data-name="{{ e.filename|lower }}"
-           data-uploaded="{{ e.uploaded_at }}">
-        <div class="card-surface">
-          <div class="card-body card-body-compact">
-            <div class="d-flex justify-content-between">
-              <div>
-                <div class="lac-title">LAC: {{ e.lac_no }} - {{ e.lac_name }}</div>
-                <div class="year-big">{{ e.year }}</div>
-                <div class="booth">{{ e.polling_station }}</div>
-                <div class="address">{{ e.district }} / {{ e.block }} / {{ e.gp }}</div>
-              </div>
-              <div class="text-end">
-                <div class="uploaded">Uploaded</div>
-                <div class="uploaded fw-semibold">{{ e.uploaded_at }}</div>
-              </div>
-            </div>
-
-            <div class="file-box mt-2">File: {{ e.filename }}</div>
+          <div class="file-box mt-2">
+            File: {{ e.filename }}
           </div>
 
-          <div class="card-actions">
-            {% if e.public_url %}
-            <a class="btn btn-outline-primary btn-action" href="{{ e.public_url }}" target="_blank" title="View">
-              <i class="bi bi-eye"></i>
-            </a>
-            {% endif %}
-            <a class="btn btn-outline-success btn-action" href="{{ url_for('download_entry', entry_id=e.id) }}" title="Download">
-              <i class="bi bi-download"></i>
-            </a>
-          </div>
         </div>
-      </div>
-      {% endfor %}
-    </div>
 
-    <div class="text-center text-muted mt-3">Use filters, sort or layout switch above.</div>
+        <div class="card-actions">
+          {% if e.public_url %}
+          <a class="btn btn-outline-primary btn-action" href="{{ e.public_url }}" target="_blank">
+            <i class="bi bi-eye"></i>
+          </a>
+          {% endif %}
+
+          <a class="btn btn-outline-success btn-action"
+             href="{{ url_for('download_entry', entry_id=e.id) }}">
+            <i class="bi bi-download"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+    {% endfor %}
+
   </div>
 
-  <!-- scroll to top -->
-  <button id="toTopBtn" class="btn btn-success rounded-circle" title="Back to top" aria-label="Back to top" style="display:none;">
-    <i class="bi bi-arrow-up"></i>
-  </button>
+  <div class="text-center text-muted mt-3">Use filters or search above.</div>
 
-  <!-- footer -->
-  <footer class="site-footer"><strong>© 2025 Bijush Kumar Roy</strong></footer>
+</div>
 
-  <script>
-  // --- Data (LAC groups) ---
-  const lacGroups = {
-    "Cachar": ["42-Udharbond", "117-Borkhola"],
-    "Karimganj": ["3-Ratabari", "4-Patharkandi"],
-    "Hailakandi": ["6-Hailakandi", "7-Katlicherra"]
-  };
+<!-- Scroll To Top -->
+<button id="toTopBtn" class="btn btn-success rounded-circle">
+  <i class="bi bi-arrow-up"></i>
+</button>
 
-  // utils
-  const norm = s => (s||'').toString().trim().replace(/\s+/g, ' ').toLowerCase();
+<!-- Footer -->
+<footer class="site-footer">
+  <strong>© 2025 Bijush Kumar Roy</strong>
+</footer>
 
-  // populate LAC dropdown grouped
-  function populateLacDropdown(districtFilterValue = "") {
-    const sel = document.getElementById('lacFilter');
-    sel.innerHTML = '<option value="">All LACs</option>';
+<script>
+/* Hardcoded LAC Groups */
+const lacGroups = {
+  "Cachar": ["42-Udharbond", "117-Borkhola"],
+  "Karimganj": ["3-Ratabari", "4-Patharkandi"],
+  "Hailakandi": ["6-Hailakandi", "7-Katlicherra"]
+};
 
-    const districts = Object.keys(lacGroups).sort((a,b)=>a.localeCompare(b));
-    districts.forEach(d=>{
-      // if districtFilterValue present, skip other districts
-      if (districtFilterValue && norm(d) !== norm(districtFilterValue)) return;
-      const og = document.createElement('optgroup');
-      og.label = d;
-      const lacs = lacGroups[d].slice();
-      lacs.sort((a,b)=>{
-        const na = Number(a.split('-',1)[0]), nb = Number(b.split('-',1)[0]);
-        if (!isNaN(na) && !isNaN(nb) && na!==nb) return na-nb;
-        return a.localeCompare(b);
-      });
-      lacs.forEach(l=>{
-        const o = document.createElement('option');
-        o.value = l;
-        o.textContent = l;
-        og.appendChild(o);
-      });
-      sel.appendChild(og);
+function populateLacDropdown(){
+  const sel = document.getElementById("lacFilter");
+  Object.keys(lacGroups).sort().forEach(dist=>{
+    const og = document.createElement("optgroup");
+    og.label = dist;
+    lacGroups[dist].forEach(lac=>{
+      const o = document.createElement("option");
+      o.value = lac;
+      o.textContent = lac;
+      og.appendChild(o);
     });
-  }
-
-  // When district changes -> update LAC options to only that district
-  function onDistrictChange(){
-    const districtEl = document.getElementById('districtFilter');
-    const lacEl = document.getElementById('lacFilter');
-    districtEl.addEventListener('change', ()=>{
-      const dval = districtEl.value;
-      populateLacDropdown(dval);
-      // clear LAC selection when district changed
-      lacEl.value = '';
-      filterEntries();
-    });
-  }
-
-  // When LAC changes -> set district if possible
-  function onLacChange(){
-    const lacEl = document.getElementById('lacFilter');
-    lacEl.addEventListener('change', ()=>{
-      const lacVal = lacEl.value;
-      if (!lacVal) return;
-      // find district that contains this LAC
-      for (const d of Object.keys(lacGroups)){
-        if (lacGroups[d].some(x => norm(x) === norm(lacVal))) {
-          // set district select to this district (if present)
-          const districtEl = document.getElementById('districtFilter');
-          if (districtEl) districtEl.value = d;
-          break;
-        }
-      }
-      filterEntries();
-    });
-  }
-
-  // filter logic (includes normalized comparisons)
-  function filterEntries(){
-    const lac = norm(document.getElementById('lacFilter')?.value || "");
-    const district = norm(document.getElementById('districtFilter')?.value || "");
-    const block = norm(document.getElementById('blockFilter')?.value || "");
-    const gp = norm(document.getElementById('gpFilter')?.value || "");
-    const polling = norm(document.getElementById('pollingFilter')?.value || "");
-    const year = norm(document.getElementById('yearFilter')?.value || "");
-    const search = norm(document.getElementById('searchBox')?.value || "");
-
-    document.querySelectorAll('.entry-card').forEach(card=>{
-      const cLac = norm(card.dataset.lac);
-      const cDistrict = norm(card.dataset.district);
-      const cBlock = norm(card.dataset.block);
-      const cGp = norm(card.dataset.gp);
-      const cPolling = norm(card.dataset.polling);
-      const cYear = norm(card.dataset.year);
-      const cName = norm(card.dataset.name);
-
-      const ok =
-        (!lac || cLac === lac) &&
-        (!district || cDistrict === district) &&
-        (!block || cBlock === block) &&
-        (!gp || cGp === gp) &&
-        (!polling || cPolling === polling) &&
-        (!year || cYear === year) &&
-        (!search || cName.includes(search));
-
-      card.style.display = ok ? '' : 'none';
-    });
-
-    // after filtering, apply current sort to visible items
-    applySort();
-  }
-
-  // sorting: az (by filename), newest/oldest by uploaded datetime
-  function applySort(){
-    const parent = document.getElementById('entriesList');
-    const items = Array.from(parent.querySelectorAll('.entry-card'));
-    const mode = document.getElementById('sortSelect')?.value || 'az';
-
-    // get visible items only
-    const visibles = items.filter(i => i.style.display !== 'none');
-
-    visibles.sort((a,b)=>{
-      if (mode === 'az') {
-        const an = (a.dataset.name||'').toLowerCase();
-        const bn = (b.dataset.name||'').toLowerCase();
-        return an.localeCompare(bn);
-      } else {
-        // parse uploaded_at in data-uploaded (format: YYYY-MM-DD HH:MM:SS)
-        const ad = new Date((a.dataset.uploaded || '').replace(' ', 'T'));
-        const bd = new Date((b.dataset.uploaded || '').replace(' ', 'T'));
-        if (isNaN(ad) || isNaN(bd)) return 0;
-        if (mode === 'newest') return bd - ad;
-        if (mode === 'oldest') return ad - bd;
-        return 0;
-      }
-    });
-
-    // Re-append visibles in sorted order (keeping hidden items in place after them)
-    visibles.forEach(node => parent.appendChild(node));
-  }
-
-  // layout toggle
-  function setupLayoutToggle(){
-    const fullBtn = document.getElementById('fullBtn');
-    const compactBtn = document.getElementById('compactBtn');
-    const entriesWrapper = document.getElementById('entriesList');
-
-    fullBtn.addEventListener('click', ()=>{
-      entriesWrapper.classList.remove('compact');
-      fullBtn.classList.add('btn-outline-secondary');
-      fullBtn.classList.remove('btn-primary');
-      compactBtn.classList.remove('btn-primary');
-      compactBtn.classList.add('btn-outline-secondary');
-    });
-
-    compactBtn.addEventListener('click', ()=>{
-      entriesWrapper.classList.add('compact');
-      compactBtn.classList.add('btn-primary');
-      compactBtn.classList.remove('btn-outline-secondary');
-      fullBtn.classList.remove('btn-primary');
-      fullBtn.classList.add('btn-outline-secondary');
-    });
-  }
-
-  // mobile toggle filter (uses computedStyle to avoid 2-click bug)
-  function setupMobileToggle(){
-    const toggleBtn = document.getElementById('toggleFilters');
-    const panel = document.getElementById('filterPanel');
-    if (!toggleBtn) return;
-    toggleBtn.addEventListener('click', ()=>{
-      const isVisible = window.getComputedStyle(panel).display !== "none";
-      if (isVisible){
-        panel.style.display = 'none';
-        toggleBtn.textContent = 'Show Filters ↓';
-        toggleBtn.classList.remove('btn-outline-secondary');
-        toggleBtn.classList.add('btn-primary');
-      } else {
-        panel.style.display = 'block';
-        toggleBtn.textContent = 'Hide Filters ↑';
-        toggleBtn.classList.remove('btn-primary');
-        toggleBtn.classList.add('btn-outline-secondary');
-      }
-    });
-  }
-
-  // scroll top
-  function setupScrollTop(){
-    const toTopBtn = document.getElementById('toTopBtn');
-    window.addEventListener('scroll', ()=>{
-      toTopBtn.style.display = window.scrollY > 300 ? 'inline-block' : 'none';
-    });
-    toTopBtn.addEventListener('click', ()=> window.scrollTo({top:0, behavior:'smooth'}));
-  }
-
-  // loading overlay hide
-  function hideLoadingOverlay(){
-    const ov = document.getElementById('loadingOverlay');
-    if (!ov) return;
-    setTimeout(()=> { ov.style.display = 'none'; }, 800); // 800ms spinner
-  }
-
-  // init
-  document.addEventListener('DOMContentLoaded', ()=>{
-    // populate lac dropdown with all by default
-    populateLacDropdown();
-
-    // wire district<->lac
-    onDistrictChange();
-    onLacChange();
-
-    // listeners for filters
-    ['districtFilter','blockFilter','gpFilter','pollingFilter','yearFilter','searchBox','lacFilter'].forEach(id=>{
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.addEventListener('input', filterEntries);
-      el.addEventListener('change', filterEntries);
-    });
-
-    // sort change
-    document.getElementById('sortSelect')?.addEventListener('change', applySort);
-
-    // layout toggle
-    setupLayoutToggle();
-
-    // mobile toggle
-    setupMobileToggle();
-
-    // scroll top
-    setupScrollTop();
-
-    // initial filter & sort
-    filterEntries();
-
-    // hide loading
-    hideLoadingOverlay();
+    sel.appendChild(og);
   });
-  </script>
+}
+
+/* FILTERING */
+function filterEntries(){
+  const lac = lacFilter.value.toLowerCase();
+  const district = districtFilter.value.toLowerCase();
+  const block = blockFilter.value.toLowerCase();
+  const gp = gpFilter.value.toLowerCase();
+  const polling = pollingFilter.value.toLowerCase();
+  const year = yearFilter.value.toLowerCase();
+  const search = searchBox.value.toLowerCase();
+
+  document.querySelectorAll(".entry-card").forEach(card=>{
+    const ok =
+      (!lac || card.dataset.lac.toLowerCase() === lac) &&
+      (!district || card.dataset.district.toLowerCase() === district) &&
+      (!block || card.dataset.block.toLowerCase() === block) &&
+      (!gp || card.dataset.gp.toLowerCase() === gp) &&
+      (!polling || card.dataset.polling.toLowerCase() === polling) &&
+      (!year || card.dataset.year.toLowerCase() === year) &&
+      (!search || card.dataset.name.includes(search));
+
+    card.style.display = ok ? "" : "none";
+  });
+}
+
+/* MOBILE FILTER BUTTON */
+document.getElementById("toggleFilters")?.addEventListener("click", ()=>{
+  const panel = document.getElementById("filterPanel");
+  const btn = document.getElementById("toggleFilters");
+
+  if(panel.style.display === "block"){
+    panel.style.display = "none";
+    btn.textContent = "Show Filters ↓";
+  } else {
+    panel.style.display = "block";
+    btn.textContent = "Hide Filters ↑";
+  }
+});
+
+/* SCROLL TOP */
+window.addEventListener("scroll", ()=>{
+  document.getElementById("toTopBtn").style.display =
+    window.scrollY > 300 ? "inline-block" : "none";
+});
+document.getElementById("toTopBtn").onclick = () =>
+  window.scrollTo({top:0, behavior:"smooth"});
+
+/* INIT */
+document.addEventListener("DOMContentLoaded", ()=>{
+  populateLacDropdown();
+  document.querySelectorAll(".filter-select").forEach(el=>{
+    el.addEventListener("input", filterEntries);
+    el.addEventListener("change", filterEntries);
+  });
+  filterEntries();
+});
+</script>
 
 </body>
 </html>
