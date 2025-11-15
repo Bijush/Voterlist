@@ -392,20 +392,22 @@
       const toggleBtn = document.getElementById('toggleFilters');
       const panel = document.getElementById('filterPanel');
       if (toggleBtn){
-        toggleBtn.addEventListener('click', ()=>{
-          if (panel.style.display === 'block' || panel.style.display === '') {
-            panel.style.display = 'none';
-            toggleBtn.textContent = 'Show Filters ↓';
-            toggleBtn.classList.remove('btn-outline-secondary');
-            toggleBtn.classList.add('btn-primary');
-          } else {
-            panel.style.display = 'block';
-            toggleBtn.textContent = 'Hide Filters ↑';
-            toggleBtn.classList.remove('btn-primary');
-            toggleBtn.classList.add('btn-outline-secondary');
-          }
-        });
-      }
+  toggleBtn.addEventListener('click', ()=>{
+    const isVisible = window.getComputedStyle(panel).display !== "none";
+
+    if (isVisible) {
+      panel.style.display = 'none';
+      toggleBtn.textContent = 'Show Filters ↓';
+      toggleBtn.classList.remove('btn-outline-secondary');
+      toggleBtn.classList.add('btn-primary');
+    } else {
+      panel.style.display = 'block';
+      toggleBtn.textContent = 'Hide Filters ↑';
+      toggleBtn.classList.remove('btn-primary');
+      toggleBtn.classList.add('btn-outline-secondary');
+    }
+  });
+}
     });
   </script>
 </body>
