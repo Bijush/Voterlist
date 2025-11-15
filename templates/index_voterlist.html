@@ -4,387 +4,184 @@
   <meta charset="utf-8">
   <title>Voter Lists</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
   <style>
-    :root {
-      --brand-green: #1b5e20;
-      --accent-green: #2e7d32;
-      --muted: #6c757d;
-      --surface: #ffffff;
-      --bg: #f4f6f8;
-    }
+    body { background: #f5f5f5; }
 
-    body {
-      background: var(--bg);
-      font-family: Inter, system-ui;
-      padding-bottom: 120px;
-      color: #222;
-    }
-
-    /* NAV */
-    .navbar {
-      background: var(--brand-green);
-      padding: 10px 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    .navbar-brand { color: #fff !important; font-size: 1.2rem; font-weight: 700; }
-
-    .upload-icon {
-      background: rgba(255,255,255,0.08);
-      padding: 8px 12px;
-      border-radius: 999px;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      text-decoration: none;
-    }
-
-    /* FILTER PANEL */
-    #filterPanel {
-      display: none;
-      overflow: hidden;
-      transition: all .35s ease;
-    }
-    @media (min-width: 768px){
-      #filterPanel { display: block !important; }
-    }
-
-    .filter-card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 14px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
-      border: 1px solid rgba(0,0,0,0.05);
-    }
-    .filter-select { min-height: 44px; border-radius: 10px; }
-
-    /* CARDS */
-    .entry-card .card-surface {
-      background: #fff;
+    .card-custom {
       border-radius: 14px;
-      border: 1px solid rgba(0,0,0,0.04);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-      transition: 0.2s ease;
+      border: 1px solid #ddd;
+      padding: 14px;
+      background: white;
+      transition: 0.2s;
     }
-    .entry-card .card-surface:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.10);
-    }
-
-    .card-body-compact {
-      padding: 18px;
+    .card-custom:hover {
+      box-shadow: 0px 5px 15px rgba(0,0,0,0.12);
     }
 
-    .lac-title {
-      color: #0f5132;
-      font-size: 1rem;
-      font-weight: 800;
-    }
-    .year-big {
-      color: var(--accent-green);
-      font-size: 1.25rem;
-      font-weight: 700;
-    }
-
-    .booth { font-weight: 600; color: #444; }
-    .address { color: var(--muted); font-size: 0.95rem; }
-
-    .file-box {
-      background: #f3f4f6;
-      padding: 10px;
-      border-radius: 8px;
-      font-weight: 600;
-      margin-top: 8px;
-    }
-
-    .uploaded { color: var(--muted); font-size: 0.85rem; }
-
-    .card-actions {
-      border-top: 1px solid rgba(0,0,0,0.05);
-      padding: 12px;
-      text-align: right;
-      background: #fff;
-    }
-    .btn-action {
-      border-radius: 10px;
-      height: 38px;
-      width: 44px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* SCROLL TOP */
-    #toTopBtn {
-      position: fixed;
-      right: 16px;
-      bottom: 90px;
+    .loader {
       display: none;
-      z-index: 2000;
-    }
-
-    /* FOOTER */
-    footer.site-footer {
-      background: #fff;
-      border-top: 1px solid #ddd;
-      padding: 12px;
-      position: fixed;
-      left: 0; right: 0; bottom: 0;
       text-align: center;
+      padding: 20px;
+      font-weight: bold;
+      color: #666;
     }
   </style>
 </head>
-<body>
 
-<!-- NAV -->
-<nav class="navbar">
-  <div class="container d-flex justify-content-between">
-    <a class="navbar-brand">📋 Voter Lists</a>
-    <a href="{{ url_for('upload') }}" class="upload-icon">
-      <i class="bi bi-cloud-upload"></i>
-      <span class="d-none d-md-inline">Upload</span>
-    </a>
-  </div>
-</nav>
+<body class="p-3">
 
-<div class="container mt-3">
+  <h3 class="text-center mb-3">📂 Voter List Records</h3>
 
-  <!-- MOBILE FILTER BUTTON -->
-  <div class="d-md-none mb-3">
-    <button id="toggleFilters" class="btn btn-primary w-100">Show Filters ↓</button>
-  </div>
+  <!-- Filters -->
+  <div class="row g-2 mb-3">
+    <div class="col-6">
+      <label class="form-label fw-bold">District</label>
+      <select id="districtFilter" class="form-select">
+        <option value="">All Districts</option>
+        <option value="Cachar">Cachar</option>
+        <option value="Karimganj">Karimganj</option>
+        <option value="Hailakandi">Hailakandi</option>
+      </select>
+    </div>
 
-  <!-- FILTER PANEL -->
-  <div id="filterPanel" class="mb-3">
-    <div class="filter-card">
+    <div class="col-6">
+      <label class="form-label fw-bold">LAC</label>
+      <select id="lacFilter" class="form-select">
+        <option value="">All LAC</option>
+      </select>
+    </div>
 
-      <div class="row g-2">
-
-        <!-- LAC -->
-        <div class="col-12 col-md-3">
-          <label class="form-label">LAC</label>
-          <select id="lacFilter" class="form-select filter-select">
-            <option value="">All LACs</option>
-          </select>
-        </div>
-
-        <!-- District -->
-        <div class="col-6 col-md-2">
-          <label class="form-label">District</label>
-          <select id="districtFilter" class="form-select filter-select">
-            <option value="">All Districts</option>
-            {% for d in entries|unique(attribute='district')|sort(attribute='district') %}
-            <option>{{ d.district }}</option>
-            {% endfor %}
-          </select>
-        </div>
-
-        <!-- Block -->
-        <div class="col-6 col-md-2">
-          <label class="form-label">Block</label>
-          <select id="blockFilter" class="form-select filter-select">
-            <option value="">All Blocks</option>
-            {% for b in entries|unique(attribute='block')|sort(attribute='block') %}
-            <option>{{ b.block }}</option>
-            {% endfor %}
-          </select>
-        </div>
-
-        <!-- GP -->
-        <div class="col-6 col-md-2">
-          <label class="form-label">GP</label>
-          <select id="gpFilter" class="form-select filter-select">
-            <option value="">All GPs</option>
-            {% for g in entries|unique(attribute='gp')|sort(attribute='gp') %}
-            <option>{{ g.gp }}</option>
-            {% endfor %}
-          </select>
-        </div>
-
-        <!-- Polling -->
-        <div class="col-6 col-md-2">
-          <label class="form-label">Polling</label>
-          <select id="pollingFilter" class="form-select filter-select">
-            <option value="">All Polling</option>
-            {% for p in entries|unique(attribute='polling_station')|sort(attribute='polling_station') %}
-            <option>{{ p.polling_station }}</option>
-            {% endfor %}
-          </select>
-        </div>
-
-        <!-- Year -->
-        <div class="col-6 col-md-1">
-          <label class="form-label">Year</label>
-          <select id="yearFilter" class="form-select filter-select">
-            <option value="">All Years</option>
-            {% for y in entries|unique(attribute='year')|sort(attribute='year') %}
-            <option>{{ y.year }}</option>
-            {% endfor %}
-          </select>
-        </div>
-
-        <!-- Search -->
-        <div class="col-12 col-md-4">
-          <label class="form-label">Search</label>
-          <input id="searchBox" class="form-control filter-select" placeholder="Search name/file...">
-        </div>
-
-      </div>
-
+    <div class="col-12 mt-2">
+      <label class="form-label fw-bold">Sort by Year</label>
+      <select id="sortYear" class="form-select">
+        <option value="asc">Ascending (A–Z)</option>
+        <option value="desc">Descending (Newest First)</option>
+      </select>
     </div>
   </div>
 
-  <!-- ENTRIES -->
-  <div class="row g-3" id="entriesList">
+  <!-- Loading -->
+  <div id="loading" class="loader">Loading...</div>
 
-    {% for e in entries %}
-    <div class="col-12 col-md-6 col-lg-4 entry-card"
-         data-lac="{{ e.lac_no }}-{{ e.lac_name }}"
-         data-district="{{ e.district }}"
-         data-block="{{ e.block }}"
-         data-gp="{{ e.gp }}"
-         data-polling="{{ e.polling_station }}"
-         data-year="{{ e.year }}"
-         data-name="{{ e.filename|lower }}">
+  <!-- Cards -->
+  <div id="recordsContainer" class="mt-2"></div>
 
-      <div class="card-surface">
+  <script>
+    const lacData = {
+      "Cachar": ["117 - Borkhola", "118 - Silchar", "119 - Udharbond"],
+      "Karimganj": ["1 - North Karimganj", "2 - South Karimganj"],
+      "Hailakandi": ["1 - Hailakandi LAC", "2 - Katlicherra LAC"]
+    };
 
-        <div class="card-body card-body-compact">
+    const records = [
+      { id: 1, district: "Cachar", lac: "117 - Borkhola", year: 2024, name: "Part 1", pdf: "#" },
+      { id: 2, district: "Cachar", lac: "117 - Borkhola", year: 2023, name: "Part 2", pdf: "#" },
+      { id: 3, district: "Karimganj", lac: "1 - North Karimganj", year: 2024, name: "List A", pdf: "#" }
+    ];
 
+    const districtFilter = document.getElementById("districtFilter");
+    const lacFilter = document.getElementById("lacFilter");
+    const sortYear = document.getElementById("sortYear");
+    const container = document.getElementById("recordsContainer");
+    const loader = document.getElementById("loading");
+
+    // Auto Fill LAC
+    districtFilter.addEventListener("change", () => {
+      lacFilter.innerHTML = `<option value="">All LAC</option>`;
+      const d = districtFilter.value;
+      if (lacData[d]) {
+        lacData[d].forEach(l => {
+          lacFilter.innerHTML += `<option value="${l}">${l}</option>`;
+        });
+      }
+      filterData();
+    });
+
+    lacFilter.addEventListener("change", filterData);
+    sortYear.addEventListener("change", filterData);
+
+    function filterData() {
+      loader.style.display = "block";
+      container.innerHTML = "";
+
+      setTimeout(() => {
+        let filtered = [...records];
+
+        if (districtFilter.value)
+          filtered = filtered.filter(r => r.district === districtFilter.value);
+
+        if (lacFilter.value)
+          filtered = filtered.filter(r => r.lac === lacFilter.value);
+
+        filtered.sort((a, b) =>
+          sortYear.value === "asc" ? a.year - b.year : b.year - a.year
+        );
+
+        loadCards(filtered);
+        loader.style.display = "none";
+      }, 300);
+    }
+
+    function loadCards(list) {
+      if (list.length === 0) {
+        container.innerHTML = `<p class="text-center text-muted mt-3">No voter list found</p>`;
+        return;
+      }
+
+      list.forEach(rec => {
+        const card = document.createElement("div");
+        card.className = "card-custom mb-2";
+
+        card.innerHTML = `
           <div class="d-flex justify-content-between">
             <div>
-              <div class="lac-title">LAC: {{ e.lac_no }} - {{ e.lac_name }}</div>
-              <div class="year-big">{{ e.year }}</div>
-              <div class="booth">{{ e.polling_station }}</div>
-              <div class="address">{{ e.district }} / {{ e.block }} / {{ e.gp }}</div>
+              <h5 class="mb-1">${rec.lac}</h5>
+              <div class="text-muted small">${rec.district} • ${rec.year}</div>
             </div>
-            <div class="text-end">
-              <div class="uploaded">Uploaded</div>
-              <div class="uploaded fw-semibold">{{ e.uploaded_at }}</div>
+
+            <div class="d-flex align-items-center gap-3">
+              <a href="${rec.pdf}" class="text-primary" title="View">
+                <i class="bi bi-eye fs-5"></i>
+              </a>
+
+              <a href="${rec.pdf}" download class="text-success" title="Download">
+                <i class="bi bi-download fs-5"></i>
+              </a>
+
+              <i class="bi bi-trash3 text-danger fs-5 delete-btn" data-id="${rec.id}" title="Delete" style="cursor:pointer"></i>
             </div>
           </div>
+        `;
 
-          <div class="file-box mt-2">
-            File: {{ e.filename }}
-          </div>
+        container.appendChild(card);
+      });
 
-        </div>
+      activateDelete();
+    }
 
-        <div class="card-actions">
-          {% if e.public_url %}
-          <a class="btn btn-outline-primary btn-action" href="{{ e.public_url }}" target="_blank">
-            <i class="bi bi-eye"></i>
-          </a>
-          {% endif %}
+    // Delete Function
+    function activateDelete() {
+      document.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.onclick = () => {
+          const id = btn.getAttribute("data-id");
 
-          <a class="btn btn-outline-success btn-action"
-             href="{{ url_for('download_entry', entry_id=e.id) }}">
-            <i class="bi bi-download"></i>
-          </a>
-        </div>
+          if (confirm("Are you sure want to delete this record?")) {
+            const index = records.findIndex(r => r.id == id);
+            if (index > -1) {
+              records.splice(index, 1);
+              filterData();
+            }
+          }
+        };
+      });
+    }
 
-      </div>
-    </div>
-    {% endfor %}
-
-  </div>
-
-  <div class="text-center text-muted mt-3">Use filters or search above.</div>
-
-</div>
-
-<!-- Scroll To Top -->
-<button id="toTopBtn" class="btn btn-success rounded-circle">
-  <i class="bi bi-arrow-up"></i>
-</button>
-
-<!-- Footer -->
-<footer class="site-footer">
-  <strong>© 2025 Bijush Kumar Roy</strong>
-</footer>
-
-<script>
-/* Hardcoded LAC Groups */
-const lacGroups = {
-  "Cachar": ["42-Udharbond", "117-Borkhola"],
-  "Karimganj": ["3-Ratabari", "4-Patharkandi"],
-  "Hailakandi": ["6-Hailakandi", "7-Katlicherra"]
-};
-
-function populateLacDropdown(){
-  const sel = document.getElementById("lacFilter");
-  Object.keys(lacGroups).sort().forEach(dist=>{
-    const og = document.createElement("optgroup");
-    og.label = dist;
-    lacGroups[dist].forEach(lac=>{
-      const o = document.createElement("option");
-      o.value = lac;
-      o.textContent = lac;
-      og.appendChild(o);
-    });
-    sel.appendChild(og);
-  });
-}
-
-/* FILTERING */
-function filterEntries(){
-  const lac = lacFilter.value.toLowerCase();
-  const district = districtFilter.value.toLowerCase();
-  const block = blockFilter.value.toLowerCase();
-  const gp = gpFilter.value.toLowerCase();
-  const polling = pollingFilter.value.toLowerCase();
-  const year = yearFilter.value.toLowerCase();
-  const search = searchBox.value.toLowerCase();
-
-  document.querySelectorAll(".entry-card").forEach(card=>{
-    const ok =
-      (!lac || card.dataset.lac.toLowerCase() === lac) &&
-      (!district || card.dataset.district.toLowerCase() === district) &&
-      (!block || card.dataset.block.toLowerCase() === block) &&
-      (!gp || card.dataset.gp.toLowerCase() === gp) &&
-      (!polling || card.dataset.polling.toLowerCase() === polling) &&
-      (!year || card.dataset.year.toLowerCase() === year) &&
-      (!search || card.dataset.name.includes(search));
-
-    card.style.display = ok ? "" : "none";
-  });
-}
-
-/* MOBILE FILTER BUTTON */
-document.getElementById("toggleFilters")?.addEventListener("click", ()=>{
-  const panel = document.getElementById("filterPanel");
-  const btn = document.getElementById("toggleFilters");
-
-  if(panel.style.display === "block"){
-    panel.style.display = "none";
-    btn.textContent = "Show Filters ↓";
-  } else {
-    panel.style.display = "block";
-    btn.textContent = "Hide Filters ↑";
-  }
-});
-
-/* SCROLL TOP */
-window.addEventListener("scroll", ()=>{
-  document.getElementById("toTopBtn").style.display =
-    window.scrollY > 300 ? "inline-block" : "none";
-});
-document.getElementById("toTopBtn").onclick = () =>
-  window.scrollTo({top:0, behavior:"smooth"});
-
-/* INIT */
-document.addEventListener("DOMContentLoaded", ()=>{
-  populateLacDropdown();
-  document.querySelectorAll(".filter-select").forEach(el=>{
-    el.addEventListener("input", filterEntries);
-    el.addEventListener("change", filterEntries);
-  });
-  filterEntries();
-});
-</script>
+    filterData();
+  </script>
 
 </body>
 </html>
