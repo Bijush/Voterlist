@@ -5,25 +5,81 @@
   <title>Upload Voter List</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <!-- Bootstrap + Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
   <style>
-    .form-section {
-      max-width: 600px;
+    :root {
+      --brand-green: #1b5e20;
+      --accent-green: #2e7d32;
+      --bg: #f4f6f8;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: Inter, system-ui;
+    }
+
+    /* NAV */
+    .navbar {
+      background: var(--brand-green);
+      padding: 10px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .navbar-brand { color: #fff !important; font-size: 1.2rem; font-weight: 700; }
+
+    /* CARD FORM */
+    .upload-card {
+      background: #fff;
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      border: 1px solid rgba(0,0,0,0.05);
+      max-width: 650px;
       margin: auto;
     }
-    .search-box {
-      margin-bottom: 8px;
+
+    .form-label { font-weight: 600; }
+    .form-control, .form-select { min-height: 45px; border-radius: 10px; }
+
+    /* Search Box */
+    #lacSearch { margin-bottom: 6px; }
+
+    /* FOOTER */
+    footer.site-footer {
+      background: #fff;
+      border-top: 1px solid #ddd;
+      padding: 12px;
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      text-align: center;
     }
   </style>
 </head>
 
-<body class="bg-light">
-  <div class="container py-4">
-    <h2 class="mb-4 text-center fw-bold">Upload Voter List PDF</h2>
+<body>
 
-    <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data"
-          class="card p-4 shadow-sm form-section">
+<!-- NAV -->
+<nav class="navbar">
+  <div class="container d-flex justify-content-between">
+    <a class="navbar-brand">📤 Upload Voter List</a>
+    <a href="{{ url_for('index') }}" class="btn btn-light">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+  </div>
+</nav>
+
+
+<div class="container my-4 mb-5">
+
+  <div class="upload-card">
+
+    <h3 class="text-center fw-bold mb-3" style="color: var(--accent-green);">
+      Upload Voter List PDF
+    </h3>
+
+    <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
 
       <!-- District -->
       <div class="mb-3">
@@ -58,8 +114,7 @@
       <div class="mb-3">
         <label class="form-label">Legislative Assembly Constituency (LAC)</label>
 
-        <!-- Search box -->
-        <input type="text" id="lacSearch" class="form-control search-box" placeholder="Search LAC...">
+        <input type="text" id="lacSearch" class="form-control" placeholder="Search LAC...">
 
         <select name="lac_no" id="lac_no" class="form-select" required>
           <option value="" disabled selected>Select LAC</option>
@@ -69,7 +124,7 @@
       <!-- Year -->
       <div class="mb-3">
         <label class="form-label">Year</label>
-        <input type="number" class="form-control" name="year" placeholder="e.g., 2024" required>
+        <input type="number" class="form-control" name="year" placeholder="2024" required>
       </div>
 
       <!-- PDF Upload -->
@@ -78,67 +133,68 @@
         <input type="file" class="form-control" name="pdfs" accept="application/pdf" multiple required>
       </div>
 
-      <button type="submit" class="btn btn-primary w-100">Upload</button>
+      <button type="submit" class="btn btn-success w-100 py-2">
+        <i class="bi bi-cloud-upload"></i> Upload Now
+      </button>
     </form>
 
-    <div class="text-center mt-3">
-      <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to List</a>
-    </div>
   </div>
 
-  <!-- JS for auto linking District → LAC + Search -->
-  <script>
-    const lacData = {
-      "Cachar": [
-        "42-Udharbond",
-        "117-Borkhola"
-      ],
-      "Karimganj": [
-        "3-Ratabari",
-        "4-Patharkandi"
-      ],
-      "Hailakandi": [
-        "6-Hailakandi",
-        "7-Katlicherra"
-      ]
-    };
+</div>
 
-    const districtSelect = document.getElementById("district");
-    const lacSelect = document.getElementById("lac_no");
-    const lacSearch = document.getElementById("lacSearch");
 
-    // Load LAC based on district
-    districtSelect.addEventListener("change", function () {
-      updateLAC(this.value);
+<footer class="site-footer">
+  <strong>© 2025 Bijush Kumar Roy</strong>
+</footer>
+
+
+<!-- JS: District → LAC Auto Linking + LAC Search -->
+<script>
+  const lacData = {
+    "Cachar": ["42-Udharbond", "117-Borkhola"],
+    "Karimganj": ["3-Ratabari", "4-Patharkandi"],
+    "Hailakandi": ["6-Hailakandi", "7-Katlicherra"]
+  };
+
+  const districtSelect = document.getElementById("district");
+  const lacSelect = document.getElementById("lac_no");
+  const lacSearch = document.getElementById("lacSearch");
+
+  // Update LAC list when district changes
+  districtSelect.addEventListener("change", function () {
+    updateLAC(this.value);
+  });
+
+  function updateLAC(district) {
+    lacSelect.innerHTML = '<option value="" disabled selected>Select LAC</option>';
+
+    if (!district || !lacData[district]) return;
+
+    lacData[district].forEach(lac => {
+      const opt = document.createElement("option");
+      opt.value = lac;
+      opt.textContent = lac;
+      lacSelect.appendChild(opt);
     });
+  }
 
-    function updateLAC(district) {
-      lacSelect.innerHTML = '<option value="" disabled selected>Select LAC</option>';
+  // Load LAC if browser keeps previously selected district
+  if (districtSelect.value) updateLAC(districtSelect.value);
 
-      if (!district || !lacData[district]) return;
+  // LAC Search Filter
+  lacSearch.addEventListener("keyup", function () {
+    const filter = lacSearch.value.toLowerCase();
+    const options = lacSelect.querySelectorAll("option");
 
-      lacData[district].forEach(lac => {
-        const opt = document.createElement("option");
-        opt.value = lac;
-        opt.textContent = lac;
-        lacSelect.appendChild(opt);
-      });
-    }
-
-    // Search filter
-    lacSearch.addEventListener("keyup", function () {
-      const filter = lacSearch.value.toLowerCase();
-      const options = lacSelect.querySelectorAll("option");
-
-      options.forEach(opt => {
-        if (opt.value.toLowerCase().includes(filter)) {
-          opt.style.display = "";
-        } else {
-          opt.style.display = "none";
-        }
-      });
+    options.forEach(opt => {
+      if (opt.textContent.toLowerCase().includes(filter) || opt.value === "") {
+        opt.style.display = "";
+      } else {
+        opt.style.display = "none";
+      }
     });
-  </script>
+  });
+</script>
 
 </body>
 </html>
