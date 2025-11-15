@@ -254,7 +254,7 @@
                   style="display:inline-block; margin:0; padding:0;" onsubmit="return confirm('Delete this entry?');">
               <button type="submit" class="btn btn-ghost p-0" style="background:none; border:none; padding:0; margin:0;">
                 <span class="delete-icon" title="Delete" role="button" aria-label="Delete">
-                  <i class="bi bi-x-circle text-danger fs-5"></i>
+                  <i class="bi bi-trash3-fill text-danger fs-5"></i>
                 </span>
               </button>
             </form>
@@ -306,12 +306,11 @@
         return a.localeCompare(b);
       });
       lacs.forEach(l=>{
-        const o = document.createElement('option');
-        // option value normalized (no spaces) to match data-lac normalization
-        o.value = l.replace(/\s+/g,'');
-        o.textContent = l.replace('-', ' – ');
-        og.appendChild(o);
-      });
+  const o = document.createElement('option');
+  o.value = l.replace(/\s+/g,'').toLowerCase();   // FIXED
+  o.textContent = l.replace('-', ' – ');
+  og.appendChild(o);
+});
       sel.appendChild(og);
     });
   }
