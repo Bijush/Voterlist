@@ -159,15 +159,16 @@
         </div>
 
         <!-- Year -->
-        <div class="col-6 col-md-1">
-          <label class="form-label">Year</label>
-          <select id="yearFilter" class="form-select">
-            <option value="">All Years</option>
-            {% for e in entries|unique(attribute='year') %}
-            <option>{{ e.year }}</option>
-            {% endfor %}
-          </select>
-        </div>
+        <!-- Year -->
+<div class="col-6 col-md-1">
+  <label class="form-label">Year</label>
+  <select id="yearFilter" class="form-select">
+    <option value="">All Years</option>
+    {% for e in entries|unique(attribute='year')|sort(attribute='year') %}
+    <option>{{ e.year }}</option>
+    {% endfor %}
+  </select>
+</div>
 
         <!-- Search -->
         <div class="col-12 col-md-4">
